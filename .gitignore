@@ -1,0 +1,71 @@
+```
+# Compiled and build artifacts
+*.dll
+*.exe
+*.pdb
+*.runtimeconfig.json
+*.deps.json
+*.AssemblyAttributes.cs
+*.Up2Date
+*.AssemblyInfo.cs
+*.AssemblyInfoInputs.cache
+*.GlobalUsings.g.cs
+*.assets.cache
+*.FileListAbsolute.txt
+*.genruntimeconfig.cache
+apphost
+ref/
+refint/
+*.nupkg
+*.nuspec
+
+# Build directories
+bin/
+obj/
+
+# Dependencies
+packages/
+packages-*.deb
+
+# Logs and temp files
+*.log
+*.tmp
+
+# Environment
+.env
+.env.local
+*.env.*
+
+# Editors
+.vscode/
+.idea/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Coverage reports
+coverage/
+htmlcov/
+*.coverage
+
+# Compression files
+*.zip
+*.gz
+*.tar
+*.tgz
+*.bz2
+*.xz
+*.7z
+*.rar
+*.zst
+*.lz4
+*.lzh
+*.cab
+*.arj
+*.rpm
+*.deb
+*.Z
+*.lz
+*.lzo
+```
