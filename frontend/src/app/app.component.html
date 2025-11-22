@@ -1,0 +1,30 @@
+<div class="container">
+  <header>
+    <h1>{{ title }}</h1>
+    <div class="status" [class.connected]="arduinoStatus?.connected" [class.disconnected]="!arduinoStatus?.connected">
+      Arduino: <span>{{ arduinoStatus?.connected ? 'Connected' : 'Disconnected' }}</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="player-controls">
+      <h2>Music Player</h2>
+      <div class="current-song" *ngIf="selectedSong">
+        <p>Currently playing: <strong>{{ selectedSong.title }}</strong></p>
+        <button (click)="stopPlayback()" [disabled]="loading" class="stop-btn">Stop</button>
+      </div>
+      
+      <div class="song-list">
+        <h3>Available Songs</h3>
+        <div class="song-item" *ngFor="let song of songs">
+          <span class="song-title">{{ song.title }}</span>
+          <button (click)="playSong(song)" [disabled]="loading" class="play-btn">Play</button>
+        </div>
+      </div>
+    </section>
+  </main>
+  
+  <footer>
+    <p>Arduino Music Control System</p>
+  </footer>
+</div>

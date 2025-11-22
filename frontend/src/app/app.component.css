@@ -1,0 +1,132 @@
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 15px;
+}
+
+header h1 {
+  margin: 0;
+  color: #333;
+}
+
+.status {
+  padding: 8px 15px;
+  border-radius: 20px;
+  font-weight: bold;
+}
+
+.status.connected {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status.disconnected {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+main {
+  margin: 20px 0;
+}
+
+.player-controls h2 {
+  margin-top: 0;
+  color: #333;
+}
+
+.current-song {
+  background-color: #e9f7ef;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.current-song p {
+  margin: 0;
+  font-size: 18px;
+}
+
+.song-list h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.song-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  background-color: #f9f9f9;
+}
+
+.song-title {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.play-btn {
+  background-color: #28a745;
+  color: white;
+}
+
+.play-btn:hover:not(:disabled) {
+  background-color: #218838;
+}
+
+.play-btn:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}
+
+.stop-btn {
+  background-color: #dc3545;
+  color: white;
+  padding: 8px 16px;
+}
+
+.stop-btn:hover:not(:disabled) {
+  background-color: #c82333;
+}
+
+.stop-btn:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}
+
+footer {
+  margin-top: 40px;
+  text-align: center;
+  color: #666;
+  border-top: 1px solid #eee;
+  padding-top: 20px;
+}
+
+button:disabled {
+  opacity: 0.6;
+}
