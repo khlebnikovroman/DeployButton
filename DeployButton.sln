@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeployButton", "DeployButton\DeployButton.csproj", "{EAA46C22-2DFF-4883-BFF3-D4C8B7C1C433}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeployButton.Api", "DeployButton.Api\DeployButton.Api.csproj", "{698C2CEE-6264-4266-8E47-D0320372C300}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{EAA46C22-2DFF-4883-BFF3-D4C8B7C1C433}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EAA46C22-2DFF-4883-BFF3-D4C8B7C1C433}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EAA46C22-2DFF-4883-BFF3-D4C8B7C1C433}.Release|Any CPU.Build.0 = Release|Any CPU
+		{698C2CEE-6264-4266-8E47-D0320372C300}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{698C2CEE-6264-4266-8E47-D0320372C300}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{698C2CEE-6264-4266-8E47-D0320372C300}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{698C2CEE-6264-4266-8E47-D0320372C300}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
