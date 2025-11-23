@@ -23,11 +23,17 @@ public class Program
         builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 
         builder.Services.AddSingleton<IDeviceStateProvider, DeviceStateProvider>();
-        builder.Services.AddSingleton<IDeployTrigger, TeamCityDeployHandler>();
+        builder.Services.AddSingleton<IDeployTrigger, TeamCityDeployHandler>(); // Legacy - will be removed
+        builder.Services.AddScoped<ITeamCityService, TeamCityService>();
+        builder.Services.AddScoped<IBuildStatusMonitor, BuildStatusMonitor>();
+        builder.Services.AddScoped<IDeploymentService, TeamCityDeploymentService>();
+        builder.Services.AddSingleton<IDeploymentServiceFactory, DeploymentServiceFactory>();
         builder.Services.AddSingleton<ISerialDeviceAdapterFactory, SerialDeviceAdapterFactory>();
         builder.Services.AddSingleton<ISoundPlayer, SerialSoundPlayer>();
+        builder.Services.AddSingleton<DeviceCommandHandler>();
         builder.Services.AddSingleton<DeviceMonitorService>();
-        builder.Services.AddHostedService<DeviceMonitorService>();
+        builder.Services.AddSingleton<RefactoredDeviceMonitorService>();
+        builder.Services.AddHostedService<RefactoredDeviceMonitorService>();
 
         // Web API
         builder.Services.AddControllers();
