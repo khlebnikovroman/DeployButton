@@ -1,6 +1,6 @@
 ﻿using DeployButton.Api.Abstractions;
 
-namespace DeployButton.Services;
+namespace DeployButton.Api.Services;
 
 public class SerialSoundPlayer : ISoundPlayer
 {

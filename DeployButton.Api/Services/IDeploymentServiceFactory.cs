@@ -1,4 +1,4 @@
-namespace DeployButton.Services;
+namespace DeployButton.Api.Services;
 
 /// <summary>
 /// Factory interface for creating deployment services

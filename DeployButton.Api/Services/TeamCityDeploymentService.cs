@@ -2,7 +2,7 @@ using DeployButton.Api.Abstractions;
 using DeployButton.Api.Configs;
 using Microsoft.Extensions.Options;
 
-namespace DeployButton.Services;
+namespace DeployButton.Api.Services;
 
 public class TeamCityDeploymentService : IDeploymentService, IDisposable
 {

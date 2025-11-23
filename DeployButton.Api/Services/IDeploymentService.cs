@@ -1,6 +1,4 @@
-using DeployButton.Api.Abstractions;
-
-namespace DeployButton.Services;
+namespace DeployButton.Api.Services;
 
 /// <summary>
 /// Interface for deployment service that handles triggering deployments

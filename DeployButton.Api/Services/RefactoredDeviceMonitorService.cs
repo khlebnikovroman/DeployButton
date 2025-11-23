@@ -1,4 +1,3 @@
-using DeployButton.Api;
 using DeployButton.Api.Abstractions;
 using DeployButton.Api.Adapters;
 using DeployButton.Api.Configs;
@@ -6,7 +5,7 @@ using DeployButton.Api.Factories;
 using DeployButton.Api.Models;
 using Microsoft.Extensions.Options;
 
-namespace DeployButton.Services;
+namespace DeployButton.Api.Services;
 
 public class RefactoredDeviceMonitorService : IHostedService, IDisposable
 {

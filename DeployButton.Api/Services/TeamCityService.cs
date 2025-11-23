@@ -1,10 +1,9 @@
 using System.Net.Http.Headers;
-using System.Text;
 using System.Xml;
 using DeployButton.Api.Configs;
 using Microsoft.Extensions.Options;
 
-namespace DeployButton.Services;
+namespace DeployButton.Api.Services;
 
 public class TeamCityService : ITeamCityService, IDisposable
 {

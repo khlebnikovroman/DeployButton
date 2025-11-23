@@ -2,7 +2,7 @@ using DeployButton.Api.Abstractions;
 using DeployButton.Api.Adapters;
 using DeployButton.Api.Configs;
 using DeployButton.Api.Factories;
-using DeployButton.Services;
+using DeployButton.Api.Services;
 using Microsoft.OpenApi;
 
 namespace DeployButton.Api;

@@ -1,6 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
-
-namespace DeployButton.Services;
+namespace DeployButton.Api.Services;
 
 public class DeploymentServiceFactory : IDeploymentServiceFactory
 {

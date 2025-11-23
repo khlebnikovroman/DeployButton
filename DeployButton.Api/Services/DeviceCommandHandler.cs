@@ -1,6 +1,4 @@
-using DeployButton.Api.Abstractions;
-
-namespace DeployButton.Services;
+namespace DeployButton.Api.Services;
 
 /// <summary>
 /// Handles device commands received from the serial device

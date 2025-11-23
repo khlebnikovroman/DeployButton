@@ -1,6 +1,6 @@
 using DeployButton.Api.Configs;
 
-namespace DeployButton.Services;
+namespace DeployButton.Api.Services;
 
 /// <summary>
 /// Interface for TeamCity API communication
