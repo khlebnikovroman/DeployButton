@@ -2,8 +2,6 @@
 
 namespace DeployButton.Api.Abstractions;
 
-public interface IDeviceStateProvider
+public interface IDeviceStateProvider : IDeviceStateService
 {
-    DeviceState CurrentState { get; }
-    void UpdateState(DeviceState state);
 }

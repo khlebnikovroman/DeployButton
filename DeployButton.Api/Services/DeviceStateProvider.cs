@@ -11,7 +11,7 @@ using Microsoft.Extensions.Options;
 
 namespace DeployButton.Services;
 
-public class DeviceStateProvider : IDeviceStateProvider
+public class DeviceStateProvider : IDeviceStateService
 {
     private DeviceState _state = new();
     private readonly object _lock = new();
@@ -28,10 +28,10 @@ public class DeviceStateProvider : IDeviceStateProvider
 }
 
 
-public class DeviceMonitorService : IHostedService, IDisposable
+public class DeviceMonitorService : IDeviceMonitorService, IHostedService, IDisposable
 {
     private readonly IOptionsMonitor<AppSettings> _options;
-    private readonly IDeviceStateProvider _stateProvider;
+    private readonly IDeviceStateService _stateProvider;
     private readonly ISerialDeviceAdapterFactory _adapterFactory;
     private readonly IDeployTrigger? _deployTrigger;
     private readonly ILogger<DeviceMonitorService> _logger;
@@ -41,7 +41,7 @@ public class DeviceMonitorService : IHostedService, IDisposable
 
     public DeviceMonitorService(
         IOptionsMonitor<AppSettings> options,
-        IDeviceStateProvider stateProvider,
+        IDeviceStateService stateProvider,
         ISerialDeviceAdapterFactory adapterFactory,
         IDeployTrigger? deployTrigger,
         ILogger<DeviceMonitorService> logger)
