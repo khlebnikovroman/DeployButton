@@ -19,7 +19,8 @@ public class SerialDeviceAdapterFactory : ISerialDeviceAdapterFactory
         {
             DtrEnable = true,
             RtsEnable = true,
-            ReadTimeout = 1000
+            ReadTimeout = 1000,
+            WriteTimeout = 1000
         };
         return new SerialDeviceAdapter(port, _logger);
     }

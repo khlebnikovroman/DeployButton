@@ -1,5 +1,4 @@
-﻿using System.IO.Ports;
-using System.Text;
+using System.IO.Ports;
 using DeployButton.Api.Abstractions;
 
 namespace DeployButton.Api.Adapters;
@@ -7,23 +6,38 @@ namespace DeployButton.Api.Adapters;
 /// <summary>
 /// Simplified serial device adapter that follows SOLID principles with minimal dependencies
 /// </summary>
-public class SerialDeviceAdapter : ISerialDeviceReader, ISerialDeviceWriter, IDisposable
+public class SimpleSerialDeviceAdapter : ISerialDeviceReader, ISerialDeviceWriter, IDisposable
 {
     private readonly SerialPort _port;
-    private readonly ILogger<SerialDeviceAdapter> _logger;
+    private readonly ILogger<SimpleSerialDeviceAdapter> _logger;
     private readonly object _lock = new object();
     private bool _isConnected;
     private bool _disposed = false;
 
     public event Action<string>? OnCommandReceived;
     public bool IsConnected => _isConnected && _port?.IsOpen == true;
-    public SerialPort Port => _port;
 
-    public SerialDeviceAdapter(SerialPort port, ILogger<SerialDeviceAdapter> logger)
+    public SimpleSerialDeviceAdapter(string portName, int baudRate, ILogger<SimpleSerialDeviceAdapter> logger)
     {
-        _port = port ?? throw new ArgumentNullException(nameof(port));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _port.DataReceived += OnDataReceived;
+        
+        try
+        {
+            _port = new SerialPort(portName, baudRate)
+            {
+                DtrEnable = true,
+                RtsEnable = true,
+                ReadTimeout = 1000,
+                WriteTimeout = 1000
+            };
+            
+            _port.DataReceived += OnDataReceived;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error creating serial port {PortName}", portName);
+            throw;
+        }
     }
 
     private void OnDataReceived(object sender, SerialDataReceivedEventArgs e)
@@ -32,7 +46,7 @@ public class SerialDeviceAdapter : ISerialDeviceReader, ISerialDeviceWriter, IDi
 
         try
         {
-            // Read all available data (instead of just one line)
+            // Read all available data
             var data = _port.ReadExisting().Trim();
             if (!string.IsNullOrEmpty(data))
             {
