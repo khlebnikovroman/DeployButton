@@ -2,7 +2,7 @@ using DeployButton.Api.Abstractions;
 using DeployButton.Api.Adapters;
 using DeployButton.Api.Configs;
 using DeployButton.Api.Factories;
-using DeployButton.Services;
+using DeployButton.Api.Services;
 using Microsoft.OpenApi;
 
 namespace DeployButton.Api;
@@ -27,7 +27,10 @@ public class Program
         builder.Services.AddSingleton<ISerialDeviceAdapterFactory, SerialDeviceAdapterFactory>();
         builder.Services.AddSingleton<ISoundPlayer, SerialSoundPlayer>();
         builder.Services.AddSingleton<DeviceMonitorService>();
-        builder.Services.AddHostedService<DeviceMonitorService>();
+        builder.Services.AddSingleton<DeviceMonitorHostedService>();
+        builder.Services.AddSingleton<ISerialDeviceAdapterProvider>(x => x.GetService<DeviceMonitorService>());
+        builder.Services.AddHostedService<DeviceMonitorHostedService>();
+        builder.Services.AddSingleton<IDeviceSubscriber, DeviceSubscriber>();
 
         // Web API
         builder.Services.AddControllers();
@@ -83,7 +86,7 @@ public class Program
 
         // === 5. Запуск ===
         logger.LogInformation("Запуск DeployButton...");
-        
+        app.Services.GetService<IDeviceSubscriber>().Subscribe();
         await app.RunAsync();
     }
 }

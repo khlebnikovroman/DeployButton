@@ -20,7 +20,6 @@ public class TeamCityClientFactory : ITeamCityClientFactory
 public class TeamCityDeployHandler : IDeployTrigger, IDisposable
 {
     private readonly IOptionsMonitor<AppSettings> _options;
-    private readonly ISoundPlayer _soundPlayer;
     private readonly ILogger<TeamCityDeployHandler> _logger;
     private readonly HttpClient _httpClient;
 
@@ -29,11 +28,9 @@ public class TeamCityDeployHandler : IDeployTrigger, IDisposable
 
     public TeamCityDeployHandler(
         IOptionsMonitor<AppSettings> options,
-        ISoundPlayer soundPlayer,
         ILogger<TeamCityDeployHandler> logger)
     {
         _options = options;
-        _soundPlayer = soundPlayer;
         _logger = logger;
 
         var handler = new HttpClientHandler { UseCookies = false };
@@ -66,7 +63,6 @@ public class TeamCityDeployHandler : IDeployTrigger, IDisposable
             if (string.IsNullOrWhiteSpace(config.BaseUrl) || string.IsNullOrWhiteSpace(config.BuildConfigurationId))
             {
                 _logger.LogError("TeamCity: не указаны BaseUrl или BuildConfigurationId");
-                await _soundPlayer.PlaySoundAsync(_options.CurrentValue.Audio.BuildFail);
                 return;
             }
 
@@ -76,14 +72,12 @@ public class TeamCityDeployHandler : IDeployTrigger, IDisposable
             if (await IsBuildQueuedOrRunningAsync(config))
             {
                 _logger.LogWarning("Сборка уже в очереди или выполняется");
-                await _soundPlayer.PlaySoundAsync(_options.CurrentValue.Audio.BuildFail);
                 return;
             }
 
             // Запускаем сборку
             await TriggerBuildAsync(config);
             _logger.LogInformation("✅ Сборка запущена в TeamCity");
-            await _soundPlayer.PlaySoundAsync(_options.CurrentValue.Audio.DeployStart);
 
             // Получаем ID последней запущенной сборки
             var buildId = await GetLastBuildIdAsync(config);
@@ -95,13 +89,11 @@ public class TeamCityDeployHandler : IDeployTrigger, IDisposable
             else
             {
                 _logger.LogWarning("Не удалось получить ID сборки — мониторинг недоступен");
-                await _soundPlayer.PlaySoundAsync(_options.CurrentValue.Audio.BuildSuccess);
             }
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "💥 Ошибка при запуске деплоя");
-            await _soundPlayer.PlaySoundAsync(_options.CurrentValue.Audio.BuildFail);
         }
         finally
         {
@@ -180,13 +172,11 @@ public class TeamCityDeployHandler : IDeployTrigger, IDisposable
                 if (status == "SUCCESS")
                 {
                     _logger.LogInformation("✅ Сборка {BuildId} завершена успешно", buildId);
-                    await _soundPlayer.PlaySoundAsync(_options.CurrentValue.Audio.BuildSuccess);
                     return;
                 }
                 else if (status == "FAILURE" || status == "ERROR")
                 {
                     _logger.LogWarning("❌ Сборка {BuildId} завершена с ошибкой", buildId);
-                    await _soundPlayer.PlaySoundAsync(_options.CurrentValue.Audio.BuildFail);
                     return;
                 }
             }
@@ -199,7 +189,6 @@ public class TeamCityDeployHandler : IDeployTrigger, IDisposable
         }
 
         _logger.LogWarning("Таймаут мониторинга сборки {BuildId}", buildId);
-        await _soundPlayer.PlaySoundAsync(_options.CurrentValue.Audio.BuildFail);
     }
 
     private async Task<string?> GetBuildStatusAsync(string buildId)

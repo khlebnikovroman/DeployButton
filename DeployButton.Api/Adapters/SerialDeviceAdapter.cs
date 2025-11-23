@@ -4,7 +4,7 @@ using DeployButton.Api.Abstractions;
 
 namespace DeployButton.Api.Adapters;
 
-public class SerialDeviceAdapter : ISerialDeviceReader, ISerialDeviceWriter, IDisposable
+public class SerialDeviceAdapter : ISerialDeviceAdapter, IDisposable
 {
     private readonly SerialPort _port;
     private readonly ILogger<SerialDeviceAdapter> _logger;
@@ -40,7 +40,7 @@ public class SerialDeviceAdapter : ISerialDeviceReader, ISerialDeviceWriter, IDi
     public async Task SendCommandAsync(string command)
     {
         if (!_port.IsOpen) return;
-        await _port.BaseStream.WriteAsync(Encoding.UTF8.GetBytes($"{command}\n"));
+        _port.WriteLine(command);
         _logger.LogDebug("→ {Command}", command);
     }
 
@@ -56,7 +56,7 @@ public class SerialDeviceAdapter : ISerialDeviceReader, ISerialDeviceWriter, IDi
         {
             await SendCommandAsync("PING");
             var delay = Task.Delay(2000, ct);
-            var winner = await Task.WhenAny(tcs.Task, delay);
+            await Task.WhenAny(tcs.Task, delay);
             return tcs.Task.IsCompletedSuccessfully;
         }
         finally

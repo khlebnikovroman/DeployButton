@@ -17,8 +17,8 @@ public class SerialDeviceAdapterFactory : ISerialDeviceAdapterFactory
     {
         var port = new System.IO.Ports.SerialPort(portName, baudRate)
         {
-            DtrEnable = true,
-            RtsEnable = true,
+            DtrEnable = false,
+            RtsEnable = false,
             ReadTimeout = 1000
         };
         return new SerialDeviceAdapter(port, _logger);

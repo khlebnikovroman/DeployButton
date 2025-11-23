@@ -4,3 +4,4 @@ public interface ISerialDeviceWriter
 {
     Task SendCommandAsync(string command);
 }
+public interface ISerialDeviceAdapter: ISerialDeviceWriter, ISerialDeviceReader, IDisposable;

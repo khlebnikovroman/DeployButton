@@ -1,15 +1,15 @@
 ﻿using DeployButton.Api.Abstractions;
 
-namespace DeployButton.Services;
+namespace DeployButton.Api.Services;
 
 public class SerialSoundPlayer : ISoundPlayer
 {
-    private readonly ISerialDeviceWriter _writer;
+    private readonly ISerialDeviceAdapterProvider _adapterProvider;
     private readonly ILogger<SerialSoundPlayer> _logger;
 
-    public SerialSoundPlayer(ISerialDeviceWriter writer, ILogger<SerialSoundPlayer> logger)
+    public SerialSoundPlayer(ISerialDeviceAdapterProvider adapterProvider, ILogger<SerialSoundPlayer> logger)
     {
-        _writer = writer;
+        _adapterProvider = adapterProvider;
         _logger = logger;
     }
 
@@ -17,7 +17,7 @@ public class SerialSoundPlayer : ISoundPlayer
     {
         if (int.TryParse(soundId, out var num) && num is >= 1 and <= 255)
         {
-            await _writer.SendCommandAsync($"PLAYSOUND {soundId}");
+            await _adapterProvider.GetAdapter().SendCommandAsync($"PLAYSOUND {soundId}");
         }
         else
         {
@@ -29,7 +29,7 @@ public class SerialSoundPlayer : ISoundPlayer
     {
         if (volume is >= 0 and <= 30)
         {
-            await _writer.SendCommandAsync($"SETVOLUME {volume}");
+            await _adapterProvider.GetAdapter().SendCommandAsync($"SETVOLUME {volume}");
         }
     }
 }
