@@ -1,0 +1,68 @@
+<mat-card>
+  <mat-card-title>Настройки звука</mat-card-title>
+
+  @if (configForm) {
+    <form [formGroup]="configForm">
+      <mat-form-field appearance="fill">
+        <mat-label>Громкость</mat-label>
+        <input matInput type="number" formControlName="volume" min="0" max="30" />
+      </mat-form-field>
+
+      <div formGroupName="audio">
+        <!-- Deploy Start -->
+        <div formGroupName="deployStart" class="sound-event">
+          <h3>Нажатие кнопки</h3>
+          <mat-checkbox formControlName="enabled">Включить звук</mat-checkbox>
+
+          @if (configForm.get('audio.deployStart.enabled')?.value) {
+            <mat-form-field appearance="fill">
+              <mat-label>Звук</mat-label>
+              <mat-select formControlName="selectedSoundId">
+                @for (id of originalConfig!.audio.deployStart.soundIds; track id) {
+                  <mat-option [value]="id">{{ id }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          }
+        </div>
+
+        <!-- Build Success -->
+        <div formGroupName="buildSuccess" class="sound-event">
+          <h3>Сборка успешна</h3>
+          <mat-checkbox formControlName="enabled">Включить звук</mat-checkbox>
+
+          @if (configForm.get('audio.buildSuccess.enabled')?.value) {
+            <mat-form-field appearance="fill">
+              <mat-label>Звук</mat-label>
+              <mat-select formControlName="selectedSoundId">
+                @for (id of originalConfig!.audio.buildSuccess.soundIds; track id) {
+                  <mat-option [value]="id">{{ id }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          }
+        </div>
+
+        <!-- Build Fail -->
+        <div formGroupName="buildFail" class="sound-event">
+          <h3>Сборка провалена</h3>
+          <mat-checkbox formControlName="enabled">Включить звук</mat-checkbox>
+
+          @if (configForm.get('audio.buildFail.enabled')?.value) {
+            <mat-form-field appearance="fill">
+              <mat-label>Звук</mat-label>
+              <mat-select formControlName="selectedSoundId">
+                @for (id of originalConfig!.audio.buildFail.soundIds; track id) {
+                  <mat-option [value]="id">{{ id }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          }
+        </div>
+      </div>
+
+      <button mat-raised-button color="primary" (click)="save()">Сохранить</button>
+    </form>
+  }
+
+</mat-card>

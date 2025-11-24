@@ -20,7 +20,7 @@ void setup() {
   pinMode(buttonPin, INPUT_PULLUP);
   pinMode(ledPin, OUTPUT);
 
-  Serial.begin(9600);
+  Serial.begin(115200);
   mySoftwareSerial.begin(9600);
 
   if (!myDFPlayer.begin(mySoftwareSerial)) {

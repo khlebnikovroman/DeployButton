@@ -1,4 +1,6 @@
-﻿namespace DeployButton.Api.Abstractions;
+﻿using DeployButton.Api.Hubs;
+
+namespace DeployButton.Api.Abstractions;
 
 public class DeviceSubscriber : IDeviceSubscriber
 {
@@ -7,17 +9,19 @@ public class DeviceSubscriber : IDeviceSubscriber
     private readonly ILogger<DeviceSubscriber> _logger;
     private readonly IDeployTrigger _deployTrigger;
     private readonly ISoundPlayer _soundPlayer;
-
+    private readonly IDeviceEventPublisher _eventPublisher;
     public DeviceSubscriber(
         ISerialDeviceAdapterProvider adapterProvider,
         ILogger<DeviceSubscriber> logger,
         IDeployTrigger deployTrigger,
-        ISoundPlayer soundPlayer)
+        ISoundPlayer soundPlayer,
+        IDeviceEventPublisher eventPublisher)
     {
         _adapterProvider = adapterProvider;
         _logger = logger;
         _deployTrigger = deployTrigger;
         _soundPlayer = soundPlayer;
+        _eventPublisher = eventPublisher;
     }
     
     public void Subscribe()
@@ -29,6 +33,7 @@ public class DeviceSubscriber : IDeviceSubscriber
     {
         _adapter?.Dispose();
         _adapter = _adapterProvider.GetAdapter();
+        _eventPublisher.PublishDeviceStateChangedAsync();
         if (_adapter != null)
         {
             _adapter.OnCommandReceived += AdapterOnOnCommandReceived;

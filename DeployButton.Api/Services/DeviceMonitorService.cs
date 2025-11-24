@@ -96,7 +96,6 @@ public class DeviceMonitorService : ISerialDeviceAdapterProvider, IHostedService
                 IsConnected = adapter != null,
                 PortName = adapter?.Port.PortName,
                 BaudRate = adapter?.Port.BaudRate,
-                AvailablePorts = availablePorts
             });
 
             if (adapter != null)
@@ -105,6 +104,12 @@ public class DeviceMonitorService : ISerialDeviceAdapterProvider, IHostedService
                 _logger.LogInformation("Устройство подключено к {Port}", adapter.Port.PortName);
 
                 await WaitForDisconnection(adapter, ct);
+                _stateProvider.UpdateState(new DeviceState
+                {
+                    IsConnected = false,
+                    PortName = null,
+                    BaudRate = null,
+                });
                 CurrentAdapter = null;
                 adapter.Dispose();
             }

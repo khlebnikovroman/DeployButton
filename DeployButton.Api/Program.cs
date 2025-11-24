@@ -2,6 +2,7 @@ using DeployButton.Api.Abstractions;
 using DeployButton.Api.Adapters;
 using DeployButton.Api.Configs;
 using DeployButton.Api.Factories;
+using DeployButton.Api.Hubs;
 using DeployButton.Api.Services;
 using Microsoft.OpenApi;
 
@@ -21,7 +22,8 @@ public class Program
 
         // === 2. Сервисы DI ===
         builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
-
+        builder.Services.AddSignalR();
+        builder.Services.AddSingleton<IDeviceEventPublisher, DeviceEventPublisher>();
         builder.Services.AddSingleton<IDeviceStateProvider, DeviceStateProvider>();
         builder.Services.AddSingleton<IDeployTrigger, TeamCityDeployHandler>();
         builder.Services.AddSingleton<ISerialDeviceAdapterFactory, SerialDeviceAdapterFactory>();
@@ -42,6 +44,9 @@ public class Program
             {
                 options.ServiceName = "DeployButton Service";
             });
+        }
+        else
+        {
             builder.Services.AddSwaggerGen(options =>
             {
                 options.SwaggerDoc("v1", new OpenApiInfo()
@@ -80,7 +85,14 @@ public class Program
                 options.RoutePrefix = "swagger"; // UI будет на /swagger
             });
         }
-        
+        if (app.Environment.IsDevelopment())
+        {
+            app.UseCors(policy => policy
+                .AllowAnyOrigin()
+                .AllowAnyHeader()
+                .AllowAnyMethod());
+        }
+        app.MapHub<DeviceHub>("hubs/deviceHub");
         app.MapControllers();
         app.MapFallbackToFile("/index.html"); // для Angular маршрутов
 
