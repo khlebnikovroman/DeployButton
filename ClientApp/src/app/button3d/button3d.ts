@@ -1,16 +1,19 @@
-import { Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { HDRLoader } from 'three/examples/jsm/loaders/HDRLoader.js';
 import { MatCardModule } from '@angular/material/card';
+import { DeviceStateService } from '../shared/services/device-state-service'
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-button-3d',
   templateUrl: './button3d.html',
   styleUrls: ['./button3d.css'],
-  imports: [ MatCardModule]
+  imports: [MatCardModule]
 })
-export class Button3dComponent implements OnDestroy {
+export class Button3dComponent implements OnDestroy, OnInit {
   @ViewChild('container') container!: ElementRef;
 
   private scene!: THREE.Scene;
@@ -18,61 +21,70 @@ export class Button3dComponent implements OnDestroy {
   private renderer!: THREE.WebGLRenderer;
   private animationId!: number;
   private controls!: OrbitControls;
+  private mixer!: THREE.AnimationMixer;
+  private animationSubscription$: Subscription | null = null;
+  private clock = new THREE.Clock();
+  private gltfAnimations: THREE.AnimationClip[] = [];
+  /**
+   *
+   */
+  constructor(private deviceStateService: DeviceStateService) {}
+  ngOnInit() {
+    this.animationSubscription$ = this.deviceStateService.getPressedState().subscribe(() => {
+      this.playPressAnimation();
+    });
+  }
+
   ngAfterViewInit() {
     this.initThree();
-    this.animate();
+    this.render();
   }
 
   private initThree() {
-    // Сцена
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0xffffff);
 
-    // Камера
-    this.camera = new THREE.PerspectiveCamera(
-      75,
-      1,
-      1,
-      1000
-    );
+    this.camera = new THREE.PerspectiveCamera(75, 1, 1, 1000);
     this.camera.position.set(100, 0, 5);
 
-    // Рендерер
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
+    this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.container.nativeElement.appendChild(this.renderer.domElement);
-// После this.renderer = ... и this.scene.add(light)
+
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.controls.enablePan = false;
-    this.controls.enableDamping = true; // плавность
+    this.controls.enableDamping = true;
     this.controls.dampingFactor = 0.05;
     this.controls.screenSpacePanning = false;
     this.controls.minDistance = 120;
     this.controls.maxDistance = 200;
-    this.controls.update();
+
     // Свет
     const light = new THREE.DirectionalLight(0xffffff, 1);
     light.position.set(5, 5, 5);
     this.scene.add(light);
     this.scene.add(new THREE.AmbientLight(0xffffff, 0.5));
 
-    // Загрузка модели
-    const loader = new GLTFLoader();
-    loader.load('/buttonanimated.glb', (gltf) => {
-      // Центрируем модель
-      const box = new THREE.Box3().setFromObject(gltf.scene);
-      const center = box.getCenter(new THREE.Vector3());
-      gltf.scene.position.x = -center.x;
-      gltf.scene.position.y = -center.y;
-      gltf.scene.position.z = -center.z;
+    // Загрузка HDR и модели
+    const cubemap = new HDRLoader().load("hdri.hdr", (texture) => {
+      texture.mapping = THREE.EquirectangularReflectionMapping;
+      this.scene.environment = texture;
 
-      // Масштабируем (если нужно)
-      // gltf.scene.scale.set(0.5, 0.5, 0.5);
+      const loader = new GLTFLoader();
+      loader.load('buttonanimated.glb', async (gltf) => {
+      const model = gltf.scene;
+      this.scene.add(model);
 
-      this.scene.add(gltf.scene);
+      // Сохраняем анимации!
+      this.gltfAnimations = gltf.animations;
+
+      this.mixer = new THREE.AnimationMixer(model);
+
+      this.onWindowResize();
+    });;
     });
 
-    // Обработка изменения размера окна
-    this.onWindowResize()
+    this.onWindowResize();
     window.addEventListener('resize', this.onWindowResize);
   }
 
@@ -80,20 +92,37 @@ export class Button3dComponent implements OnDestroy {
     const container = this.container.nativeElement;
     const width = container.clientWidth;
     const height = container.clientHeight;
-
-    // Обновляем размеры
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(width, height);
   };
 
-  private animate = () => {
-    this.animationId = requestAnimationFrame(this.animate);
+  private render = () => {
+    this.animationId = requestAnimationFrame(this.render);
+    const delta = this.mixer ? this.clock.getDelta() : 0;
+    if (this.mixer) this.mixer.update(delta);
     this.renderer.render(this.scene, this.camera);
-    this.controls.update(); // ← важно!
+    this.controls.update();
   };
 
+  // Метод для проигрывания анимации нажатия
+  public playPressAnimation() {
+    if (!this.mixer || this.gltfAnimations.length === 0) {
+      console.warn('No animations available');
+      return;
+    }
+
+    const clip = this.gltfAnimations[0]; // первая анимация
+    const action = this.mixer.clipAction(clip);
+    action.reset().play();
+
+    // Остановка после завершения (опционально)
+    action.clampWhenFinished = true;
+    action.setLoop(THREE.LoopOnce, 1);
+  }
+
   ngOnDestroy() {
+    this.animationSubscription$?.unsubscribe();
     cancelAnimationFrame(this.animationId);
     window.removeEventListener('resize', this.onWindowResize);
     this.renderer?.dispose();

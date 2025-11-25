@@ -52,6 +52,7 @@ public class DeviceSubscriber : IDeviceSubscriber
 
     private async Task DeployCommandReceived(string command)
     {
+        _ = _eventPublisher.ButtonPressed();
         var rnd = new Random();
         await _soundPlayer.SetVolumeAsync(20);
         // await _soundPlayer.PlaySoundAsync(rnd.Next(1, 15).ToString());

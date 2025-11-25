@@ -21,13 +21,8 @@ public class DeviceEventPublisher : IDeviceEventPublisher
         return _hubContext.Clients.All.SendAsync("DeviceStateChanged", _deviceStateProvider.CurrentState);
     }
 
-    public Task PublishDeployTriggeredAsync()
+    public Task ButtonPressed()
     {
-        return _hubContext.Clients.All.SendAsync("DeployTriggered");
-    }
-
-    public Task PublishBuildStatusAsync(string status)
-    {
-        return _hubContext.Clients.All.SendAsync("BuildStatusChanged", status);
+        return _hubContext.Clients.All.SendAsync("ButtonPressed");
     }
 }

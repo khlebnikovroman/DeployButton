@@ -1,16 +1,16 @@
-﻿// services/signalr.service.ts
+﻿
 import { Injectable } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 import { DeviceState } from '../models/device-state.model';
 import { Subject } from 'rxjs'; // ← RxJS Subject
 import {BACKEND_CONFIG} from '../../core/BACKEND_CONFIG'
+
 @Injectable({ providedIn: 'root' })
 export class SignalRService {
   private hubConnection!: signalR.HubConnection;
   private baseUrl = BACKEND_CONFIG.signalr.baseUrl;
-  // Используем RxJS Subject
   private readonly deviceStateSubject = new Subject<DeviceState>();
-  private readonly deployTriggeredSubject = new Subject<void>();
+  private readonly buttonPressedSubject = new Subject<void>();
   private readonly buildStatusSubject = new Subject<string>();
 
   constructor() {
@@ -31,8 +31,8 @@ export class SignalRService {
       this.deviceStateSubject.next(state);
     });
 
-    this.hubConnection.on('DeployTriggered', () => {
-      this.deployTriggeredSubject.next();
+    this.hubConnection.on('ButtonPressed', () => {
+      this.buttonPressedSubject.next();
     });
 
     this.hubConnection.on('BuildStatusChanged', (status: string) => {
@@ -52,8 +52,8 @@ export class SignalRService {
     return this.deviceStateSubject.asObservable();
   }
 
-  get deployTriggered$() {
-    return this.deployTriggeredSubject.asObservable();
+  get buttonPressed$() {
+    return this.buttonPressedSubject.asObservable();
   }
 
   get buildStatus$() {
