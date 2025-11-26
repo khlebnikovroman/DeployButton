@@ -12,7 +12,7 @@ export class SignalRService {
   private readonly deviceStateSubject = new Subject<DeviceState>();
   private readonly buttonPressedSubject = new Subject<void>();
   private readonly buildStatusSubject = new Subject<string>();
-
+  private readonly buttonReleasedSubject = new Subject<void>();
   constructor() {
     this.createConnection();
     this.registerCallbacks();
@@ -35,6 +35,10 @@ export class SignalRService {
       this.buttonPressedSubject.next();
     });
 
+    this.hubConnection.on('ButtonReleased', () => {
+      this.buttonReleasedSubject.next();
+    });
+
     this.hubConnection.on('BuildStatusChanged', (status: string) => {
       this.buildStatusSubject.next(status);
     });
@@ -47,7 +51,6 @@ export class SignalRService {
       .catch(err => console.error('SignalR Connection Error: ', err));
   }
 
-  // Экспортируем Observable (через asObservable — опционально, но безопасно)
   get deviceState$() {
     return this.deviceStateSubject.asObservable();
   }
@@ -58,5 +61,9 @@ export class SignalRService {
 
   get buildStatus$() {
     return this.buildStatusSubject.asObservable();
+  }
+
+  get buttonReleased$() {
+    return this.buttonReleasedSubject.asObservable();
   }
 }

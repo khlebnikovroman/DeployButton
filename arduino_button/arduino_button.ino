@@ -1,5 +1,6 @@
 // Combined deploy + sound + PING/PONG
 // Supported commands: PLAYSOUND x, SETVOLUME x, PAUSE, PLAY, PING
+// Button events: DEPLOY (press), RELEASE (release)
 
 #include "SoftwareSerial.h"
 #include "DFRobotDFPlayerMini.h"
@@ -10,15 +11,12 @@ DFRobotDFPlayerMini myDFPlayer;
 
 // Button
 const int buttonPin = 2;
-const int ledPin = 13;
-bool buttonState = false;
-bool lastButtonState = false;
+bool lastButtonState = HIGH; // начальное состояние (INPUT_PULLUP → HIGH при отжатой)
 unsigned long lastDebounceTime = 0;
 const unsigned long debounceDelay = 50;
 
 void setup() {
   pinMode(buttonPin, INPUT_PULLUP);
-  pinMode(ledPin, OUTPUT);
 
   Serial.begin(115200);
   mySoftwareSerial.begin(9600);
@@ -34,23 +32,25 @@ void setup() {
 }
 
 void loop() {
-  // --- Button handling ---
-  bool reading = digitalRead(buttonPin);
-  if (reading != lastButtonState) {
+  bool currentButtonState = digitalRead(buttonPin);
+
+  if (currentButtonState != lastButtonState) {
     lastDebounceTime = millis();
   }
+
   if ((millis() - lastDebounceTime) > debounceDelay) {
-    if (reading != buttonState) {
-      buttonState = reading;
-      if (buttonState == LOW) {
-        Serial.println("DEPLOY");
-        digitalWrite(ledPin, HIGH);
-        delay(100);
-        digitalWrite(ledPin, LOW);
-      }
+    static bool wasPressed = false;
+
+    if (currentButtonState == LOW && !wasPressed) {
+      wasPressed = true;
+      Serial.println("BUTTONPRESS");
+    } else if (currentButtonState == HIGH && wasPressed) {
+      wasPressed = false;
+      Serial.println("BUTTONRELEASE");
     }
   }
-  lastButtonState = reading;
+
+  lastButtonState = currentButtonState;
 
   // --- Serial command handling ---
   if (Serial.available()) {

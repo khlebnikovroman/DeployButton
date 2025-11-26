@@ -24,14 +24,19 @@ export class Button3dComponent implements OnDestroy, OnInit {
   private mixer!: THREE.AnimationMixer;
   private animationSubscription$: Subscription | null = null;
   private clock = new THREE.Clock();
-  private gltfAnimations: THREE.AnimationClip[] = [];
+  private pressAction: THREE.AnimationAction | null = null;
+  private releaseAction: THREE.AnimationAction | null = null;
   /**
    *
    */
   constructor(private deviceStateService: DeviceStateService) {}
   ngOnInit() {
-    this.animationSubscription$ = this.deviceStateService.getPressedState().subscribe(() => {
-      this.playPressAnimation();
+    this.deviceStateService.getPressedState().subscribe(() => {
+      this.playAnimation('press');
+    });
+
+    this.deviceStateService.getReleasedState().subscribe(() => {
+      this.playAnimation('release');
     });
   }
 
@@ -75,10 +80,19 @@ export class Button3dComponent implements OnDestroy, OnInit {
       const model = gltf.scene;
       this.scene.add(model);
 
-      // Сохраняем анимации!
-      this.gltfAnimations = gltf.animations;
-
+      const pressClip = gltf.animations.find(a => a.name === 'ButtonPress');
+      const releaseClip = gltf.animations.find(a => a.name === 'ButtonRelease');
       this.mixer = new THREE.AnimationMixer(model);
+
+      this.pressAction = this.mixer.clipAction(pressClip!);
+      this.releaseAction = this.mixer.clipAction(releaseClip!);
+
+      this.pressAction.clampWhenFinished = true;
+      this.pressAction.setLoop(THREE.LoopOnce, 1);
+
+      this.releaseAction.clampWhenFinished = true;
+      this.releaseAction.setLoop(THREE.LoopOnce, 1);
+
 
       this.onWindowResize();
     });;
@@ -105,20 +119,17 @@ export class Button3dComponent implements OnDestroy, OnInit {
     this.controls.update();
   };
 
-  // Метод для проигрывания анимации нажатия
-  public playPressAnimation() {
-    if (!this.mixer || this.gltfAnimations.length === 0) {
-      console.warn('No animations available');
+  private playAnimation(type: 'press' | 'release') {
+    if (!this.mixer || !this.pressAction || !this.releaseAction) return;
+
+    const isPress = type === 'press';
+    const targetAction = isPress ? this.pressAction : this.releaseAction;
+    const currentAction = isPress ? this.releaseAction : this.pressAction;
+    if (targetAction.isRunning() && !targetAction.paused) {
       return;
     }
 
-    const clip = this.gltfAnimations[0]; // первая анимация
-    const action = this.mixer.clipAction(clip);
-    action.reset().play();
-
-    // Остановка после завершения (опционально)
-    action.clampWhenFinished = true;
-    action.setLoop(THREE.LoopOnce, 1);
+    targetAction.reset().crossFadeFrom(currentAction, 0.2, false).play();
   }
 
   ngOnDestroy() {

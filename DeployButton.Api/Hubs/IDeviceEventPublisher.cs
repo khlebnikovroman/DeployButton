@@ -4,4 +4,5 @@ public interface IDeviceEventPublisher
 {
     Task PublishDeviceStateChangedAsync();
     Task ButtonPressed();
+    Task ButtonReleased();
 }

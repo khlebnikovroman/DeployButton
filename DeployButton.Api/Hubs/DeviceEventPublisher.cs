@@ -25,4 +25,9 @@ public class DeviceEventPublisher : IDeviceEventPublisher
     {
         return _hubContext.Clients.All.SendAsync("ButtonPressed");
     }
+
+    public Task ButtonReleased()
+    {
+        return _hubContext.Clients.All.SendAsync("ButtonReleased");
+    }
 }

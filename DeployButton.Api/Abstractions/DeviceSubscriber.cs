@@ -43,16 +43,24 @@ public class DeviceSubscriber : IDeviceSubscriber
     private void AdapterOnOnCommandReceived(string command)
     {
         _logger.LogInformation("Received command: {Command}", command);
-        if (command.StartsWith("DEPLOY"))
+        if (command.StartsWith("BUTTONPRESS"))
         {
-            DeployCommandReceived(command);
+            _ = ButtonPressCommandReceived(command);
+        }
+        if (command.StartsWith("BUTTONRELEASE"))
+        {
+            _ = DeployCommandReceived(command);
         }
     }
 
+    private async Task ButtonPressCommandReceived(string command)
+    {
+        _ = _eventPublisher.ButtonPressed();
+    }
 
     private async Task DeployCommandReceived(string command)
     {
-        _ = _eventPublisher.ButtonPressed();
+        _ = _eventPublisher.ButtonReleased();
 
         var triggerResult = await _deployTrigger.TriggerAsync();
         switch (triggerResult.deployResult)

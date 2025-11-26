@@ -15,4 +15,8 @@ export class DeviceStateService {
   getPressedState(): Observable<void> {
     return this.signalR.buttonPressed$;
   }
+  
+  getReleasedState(): Observable<void> {
+    return this.signalR.buttonReleased$;
+  }
 }
