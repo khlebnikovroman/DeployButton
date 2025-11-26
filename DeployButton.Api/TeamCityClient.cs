@@ -1,11 +1,18 @@
 ﻿using System.Net.Http.Headers;
 using System.Text;
-using System.Xml;
+using System.Text.Json;
 using DeployButton.Api.Configs;
 
 namespace DeployButton.Api;
 
-public class TeamCityClient : IDisposable
+public interface ITeamCityClient : IDisposable
+{
+    Task<bool> IsBuildQueuedOrRunningAsync();
+    Task<string> TriggerBuildAsync();
+    Task<string?> GetBuildStatusAsync(string buildId);
+}
+
+public class TeamCityClient : ITeamCityClient
 {
     private readonly HttpClient _httpClient;
     private readonly TeamCityConfig _config;
@@ -17,36 +24,32 @@ public class TeamCityClient : IDisposable
 
         var credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{_config.Username}:{_config.Password}"));
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", credentials);
+        _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
     }
 
     public async Task<bool> IsBuildQueuedOrRunningAsync()
     {
-        var baseUrl = _config.BaseUrl;
-        var buildTypeId = _config.BuildConfigurationId;
+        var tasks = new[]
+        {
+            IsBuildStateActiveAsync("queued"),
+            IsBuildStateActiveAsync("running")
+        };
 
-        if (await IsBuildStateActiveAsync(baseUrl, buildTypeId, "queued")) return true;
-        if (await IsBuildStateActiveAsync(baseUrl, buildTypeId, "running")) return true;
-        return false;
+        await Task.WhenAll(tasks);
+        return tasks.Any(t => t.Result);
     }
 
-    private async Task<bool> IsBuildStateActiveAsync(string baseUrl, string buildTypeId, string state)
+    private async Task<bool> IsBuildStateActiveAsync(string state)
     {
-        var url = $"{baseUrl}/httpAuth/app/rest/builds?locator=buildType:{buildTypeId},state:{state},count:1";
+        var url = $"{_config.BaseUrl}/httpAuth/app/rest/builds?locator=buildType:{_config.BuildConfigurationId},state:{state},count:1";
         try
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, url);
-            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xml"));
+            var response = await _httpClient.GetAsync(url);
+            if (!response.IsSuccessStatusCode) return false;
 
-            var response = await _httpClient.SendAsync(request);
-            if (!response.IsSuccessStatusCode)
-                return response.StatusCode == System.Net.HttpStatusCode.NotFound ? false : false;
-
-            var xml = await response.Content.ReadAsStringAsync();
-            var doc = new XmlDocument();
-            doc.LoadXml(xml);
-
-            var countAttr = doc.DocumentElement?.Attributes["count"];
-            return countAttr != null && int.TryParse(countAttr.Value, out var count) && count > 0;
+            using var doc = await JsonDocument.ParseAsync(await response.Content.ReadAsStreamAsync());
+            var count = doc.RootElement.GetProperty("count").GetInt32();
+            return count > 0;
         }
         catch
         {
@@ -54,12 +57,47 @@ public class TeamCityClient : IDisposable
         }
     }
 
-    public async Task TriggerBuildAsync()
+    public async Task<string> TriggerBuildAsync()
     {
-        var triggerUrl = $"{_config.BaseUrl}/httpAuth/action.html?add2Queue={_config.BuildConfigurationId}";
-        var response = await _httpClient.PostAsync(triggerUrl, null);
+        var url = $"{_config.BaseUrl}/httpAuth/app/rest/buildQueue";
+        var payload = new
+        {
+            buildType = new
+            {
+                id = _config.BuildConfigurationId
+            }
+        };
+
+        var json = JsonSerializer.Serialize(payload, new JsonSerializerOptions { WriteIndented = false });
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        var response = await _httpClient.PostAsync(url, content);
         if (!response.IsSuccessStatusCode)
-            throw new HttpRequestException($"HTTP {response.StatusCode}: {response.ReasonPhrase}");
+        {
+            var error = await response.Content.ReadAsStringAsync();
+            throw new HttpRequestException($"HTTP {response.StatusCode}: {response.ReasonPhrase}. Body: {error}");
+        }
+
+        using var doc = await JsonDocument.ParseAsync(await response.Content.ReadAsStreamAsync());
+        var id = doc.RootElement.GetProperty("id").GetRawText();
+        return id;
+    }
+    
+    public async Task<string?> GetBuildStatusAsync(string buildId)
+    {
+        var url = $"{_config.BaseUrl}/httpAuth/app/rest/builds/id:{buildId}";
+        try
+        {
+            var response = await _httpClient.GetAsync(url);
+            if (!response.IsSuccessStatusCode) return null;
+
+            using var doc = await JsonDocument.ParseAsync(await response.Content.ReadAsStreamAsync());
+            return doc.RootElement.TryGetProperty("status", out var statusEl) ? statusEl.GetString() : null;
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     public void Dispose()

@@ -2,5 +2,17 @@
 
 public interface IDeployTrigger
 {
-    Task TriggerAsync();
+    Task<(DeployResult deployResult, Task<BuildResult>? buildTask)> TriggerAsync();
+}
+public enum DeployResult
+{
+    Queued,
+    AlreadyBuilding,
+    Failed,
+}
+
+public enum BuildResult
+{
+    Success,
+    Failed,
 }

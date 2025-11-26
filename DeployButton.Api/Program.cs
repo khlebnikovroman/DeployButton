@@ -27,6 +27,7 @@ public class Program
         builder.Services.AddSingleton<IDeviceStateProvider, DeviceStateProvider>();
         builder.Services.AddSingleton<IDeployTrigger, TeamCityDeployHandler>();
         builder.Services.AddSingleton<ISerialDeviceAdapterFactory, SerialDeviceAdapterFactory>();
+        builder.Services.AddSingleton<ITeamCityClientFactory, TeamCityClientFactory>();
         builder.Services.AddSingleton<ISoundPlayer, SerialSoundPlayer>();
         builder.Services.AddSingleton<DeviceMonitorService>();
         builder.Services.AddSingleton<DeviceMonitorHostedService>();

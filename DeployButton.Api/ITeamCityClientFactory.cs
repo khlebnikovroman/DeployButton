@@ -4,5 +4,5 @@ namespace DeployButton.Api;
 
 public interface ITeamCityClientFactory
 {
-    TeamCityClient Create(TeamCityConfig config);
+    ITeamCityClient Create(TeamCityConfig config);
 }
