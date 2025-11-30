@@ -1,11 +1,5 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using FFMpegCore;
-using FFMpegCore.Arguments;
+﻿using FFMpegCore;
 using FFMpegCore.Extensions.Downloader;
-using File = System.IO.File;
 
 namespace Mp3Formatter;
 
@@ -13,21 +7,55 @@ public class Program
 {
     public static async Task Main(string[] args)
     {
-        var currentDir = AppDomain.CurrentDomain.BaseDirectory;
-        
-        Console.WriteLine("Загрузка FFmpeg (если ещё не загружен)...");
-        await FFMpegDownloader.DownloadBinaries(options: new FFOptions(){BinaryFolder = currentDir});
+        // Парсинг аргументов командной строки
+        string inputDir = null;
+        string outputDir = null;
 
-        var outputDir = Path.Combine(currentDir, "renamed_mp3");
+        for (var i = 0; i < args.Length; i++)
+        {
+            switch (args[i])
+            {
+                case "-i":
+                case "--input":
+                {
+                    if (i + 1 < args.Length)
+                        inputDir = Path.GetFullPath(args[++i]);
+                    break;
+                }
+                case "-o":
+                case "--output":
+                {
+                    if (i + 1 < args.Length)
+                        outputDir = Path.GetFullPath(args[++i]);
+                    break;
+                }
+            }
+        }
+
+        var currentDir = AppDomain.CurrentDomain.BaseDirectory;
+        inputDir ??= currentDir; // по умолчанию — текущая папка
+        outputDir ??= Path.Combine(currentDir, "renamed_mp3"); // по умолчанию — подпапка
+
+        // Валидация входной директории
+        if (!Directory.Exists(inputDir))
+        {
+            Console.WriteLine($"Ошибка: входная директория не существует: {inputDir}");
+            return;
+        }
+
+        Console.WriteLine($"Загрузка FFmpeg (если ещё не загружен)...");
+        await FFMpegDownloader.DownloadBinaries(options: new FFOptions { BinaryFolder = currentDir });
+
+        // Убедимся, что outputDir существует
         Directory.CreateDirectory(outputDir);
 
-        var mp3Files = Directory.GetFiles(currentDir, "*.mp3")
+        var mp3Files = Directory.GetFiles(inputDir, "*.mp3")
             .OrderBy(Path.GetFileName)
             .ToArray();
 
         if (mp3Files.Length == 0)
         {
-            Console.WriteLine("Нет MP3-файлов в текущей директории.");
+            Console.WriteLine($"Нет MP3-файлов в директории: {inputDir}");
             return;
         }
 

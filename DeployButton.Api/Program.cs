@@ -5,6 +5,8 @@ using DeployButton.Api.Controllers;
 using DeployButton.Api.Factories;
 using DeployButton.Api.Hubs;
 using DeployButton.Api.Services;
+using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.OpenApi;
 
 namespace DeployButton.Api;
@@ -70,9 +72,21 @@ public class Program
         var wwwrootPath = Path.Combine(app.Environment.ContentRootPath, "wwwroot");
         if (Directory.Exists(wwwrootPath))
         {
+            var fileProvider = new PhysicalFileProvider(wwwrootPath);
+            var contentTypeProvider = new FileExtensionContentTypeProvider();
+            contentTypeProvider.Mappings[".hdr"] = "image/vnd.radiance";
+            contentTypeProvider.Mappings[".glb"] = "model/gltf-binary";
+
+            var staticFileOptions = new StaticFileOptions
+            {
+                FileProvider = fileProvider,
+                ContentTypeProvider = contentTypeProvider
+            };
+
             app.UseDefaultFiles();
-            app.UseStaticFiles();
-            logger.LogInformation($"SPA: раздача из {wwwrootPath}");
+            app.UseStaticFiles(staticFileOptions);
+
+            logger.LogInformation($"SPA: serving static files from {wwwrootPath}");
         }
         else
         {
