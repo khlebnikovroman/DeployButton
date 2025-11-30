@@ -2,6 +2,7 @@
 using System.Text.Json;
 using DeployButton.Api.Services;
 using Microsoft.AspNetCore.Mvc;
+using Mp3Formatter;
 
 namespace DeployButton.Api.Controllers;
 public class AudioConfigDto
@@ -80,17 +81,27 @@ public class AudioSettingsController : ControllerBase
             return Ok(Array.Empty<SoundDto>());
 
         var files = Directory.GetFiles(soundsFolder)
-            .Where(f => f.EndsWith(".mp3", StringComparison.OrdinalIgnoreCase) ||
-                        f.EndsWith(".wav", StringComparison.OrdinalIgnoreCase))
-            .Select(Path.GetFileName)
+            .Where(f => f.EndsWith(".mp3", StringComparison.OrdinalIgnoreCase))
+            // .Select(Path.GetFileName)
             .Where(f => f is not null)
             .ToArray();
-
-        var sounds = files.Select(file => new SoundDto
+        
+        var sounds = files.Select(file =>
         {
-            Id = Path.GetFileNameWithoutExtension(file!),
-            Name = Path.GetFileNameWithoutExtension(file!),
-            Url = $"/sounds/{file}"
+            var fileName = Path.GetFileName(file);
+            var filenameWithoutExtension = Path.GetFileNameWithoutExtension(file);
+            var name = filenameWithoutExtension;
+            try
+            {
+                name = Mp3MetadataReader.GetOriginalFilename(file!);
+            }
+            catch { }
+            return new SoundDto
+            {
+                Id = filenameWithoutExtension,
+                Name = name,
+                Url = $"/sounds/{fileName}"
+            };
         }).ToList();
 
         return Ok(sounds);

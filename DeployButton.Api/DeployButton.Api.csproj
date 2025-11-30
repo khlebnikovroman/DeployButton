@@ -24,4 +24,8 @@
       </None>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Mp3Shared\Mp3Shared.csproj" />
+    </ItemGroup>
+
 </Project>
