@@ -1,0 +1,24 @@
+<mat-card>
+  <mat-card-title>Настройки звука</mat-card-title>
+
+  @if (configForm) {
+  <form [formGroup]="configForm" (ngSubmit)="save()">
+    <div class="volume-control">
+      <mat-label>Громкость: {{ configForm.get('volume')?.value }}</mat-label>
+      <mat-slider min="0" max="30" [formGroup]="configForm">
+        <input matSliderThumb formControlName="volume" />
+      </mat-slider>
+    </div>
+
+    @for (eventType of eventTypes; track eventType) {
+    <app-sound-event-control 
+      [group]="getEventGroup(eventType)"
+      [label]="getEventLabel(eventType)"
+      [sounds]="sounds"></app-sound-event-control>
+    }
+    <button mat-raised-button color="primary" type="submit" [disabled]="configForm.invalid">
+      Сохранить
+    </button>
+  </form>
+  }
+</mat-card>
