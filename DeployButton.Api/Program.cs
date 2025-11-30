@@ -1,6 +1,7 @@
 using DeployButton.Api.Abstractions;
 using DeployButton.Api.Adapters;
 using DeployButton.Api.Configs;
+using DeployButton.Api.Controllers;
 using DeployButton.Api.Factories;
 using DeployButton.Api.Hubs;
 using DeployButton.Api.Services;
@@ -34,7 +35,8 @@ public class Program
         builder.Services.AddSingleton<ISerialDeviceAdapterProvider>(x => x.GetService<DeviceMonitorService>());
         builder.Services.AddHostedService<DeviceMonitorHostedService>();
         builder.Services.AddSingleton<IDeviceSubscriber, DeviceSubscriber>();
-
+        builder.Services.AddSingleton<IAudioConfigService, AudioConfigService>();
+        
         // Web API
         builder.Services.AddControllers();
 

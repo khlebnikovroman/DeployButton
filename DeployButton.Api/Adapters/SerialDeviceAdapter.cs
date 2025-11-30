@@ -13,6 +13,7 @@ public class SerialDeviceAdapter : ISerialDeviceAdapter, IDisposable
     public event Action<string>? OnCommandReceived;
     public bool IsConnected => _isConnected && _port.IsOpen;
     public SerialPort Port => _port;
+    private readonly SemaphoreSlim _writeSemaphore = new(1);
 
     public SerialDeviceAdapter(SerialPort port, ILogger<SerialDeviceAdapter> logger)
     {
@@ -40,7 +41,15 @@ public class SerialDeviceAdapter : ISerialDeviceAdapter, IDisposable
     public async Task SendCommandAsync(string command)
     {
         if (!_port.IsOpen) return;
-        _port.WriteLine(command);
+        await _writeSemaphore.WaitAsync();
+        try
+        {
+            _port.WriteLine(command);
+        }
+        finally
+        {
+            _writeSemaphore.Release();
+        }
         _logger.LogDebug("→ {Command}", command);
     }
 

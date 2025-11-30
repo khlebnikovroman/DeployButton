@@ -2,7 +2,7 @@
 using DeployButton.Api.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace DeployButton.Api.Controllers.DeployButton.Controllers;
+namespace DeployButton.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]

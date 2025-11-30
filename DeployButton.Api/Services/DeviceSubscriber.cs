@@ -1,6 +1,8 @@
-﻿using DeployButton.Api.Hubs;
+﻿using DeployButton.Api.Abstractions;
+using DeployButton.Api.Controllers;
+using DeployButton.Api.Hubs;
 
-namespace DeployButton.Api.Abstractions;
+namespace DeployButton.Api.Services;
 
 public class DeviceSubscriber : IDeviceSubscriber
 {
@@ -10,18 +12,22 @@ public class DeviceSubscriber : IDeviceSubscriber
     private readonly IDeployTrigger _deployTrigger;
     private readonly ISoundPlayer _soundPlayer;
     private readonly IDeviceEventPublisher _eventPublisher;
+    private readonly IAudioConfigService _audioConfigService;
+
     public DeviceSubscriber(
         ISerialDeviceAdapterProvider adapterProvider,
         ILogger<DeviceSubscriber> logger,
         IDeployTrigger deployTrigger,
         ISoundPlayer soundPlayer,
-        IDeviceEventPublisher eventPublisher)
+        IDeviceEventPublisher eventPublisher,
+        IAudioConfigService audioConfigService)
     {
         _adapterProvider = adapterProvider;
         _logger = logger;
         _deployTrigger = deployTrigger;
         _soundPlayer = soundPlayer;
         _eventPublisher = eventPublisher;
+        _audioConfigService = audioConfigService;
     }
     
     public void Subscribe()
@@ -61,16 +67,17 @@ public class DeviceSubscriber : IDeviceSubscriber
     private async Task DeployCommandReceived(string command)
     {
         _ = _eventPublisher.ButtonReleased();
-
+        var config = await _audioConfigService.GetConfigAsync();
+        _ = _soundPlayer.SetVolumeAsync(config.Volume);
         var triggerResult = await _deployTrigger.TriggerAsync();
         switch (triggerResult.deployResult)
         {
             case DeployResult.Queued:
-                await PlaySound(ButtonSoundEventType.BuildQueued);
+                await PlaySound(ButtonSoundEventType.BuildQueued, config);
                 break;
             case DeployResult.AlreadyBuilding:
             case DeployResult.Failed:
-                await PlaySound(ButtonSoundEventType.BuildNotQueued);
+                await PlaySound(ButtonSoundEventType.BuildNotQueued, config);
                 break;
         }
 
@@ -82,44 +89,32 @@ public class DeviceSubscriber : IDeviceSubscriber
                 switch (buildResult)
                 {
                     case BuildResult.Success:
-                        await PlaySound(ButtonSoundEventType.BuildSucceeded);
+                        await PlaySound(ButtonSoundEventType.BuildSucceeded, config);
                         break;
                     case BuildResult.Failed:
-                        await PlaySound(ButtonSoundEventType.BuildFailed);
+                        await PlaySound(ButtonSoundEventType.BuildFailed, config);
                         break;
                 }
             });
         }
     }
     
-    private async Task PlaySound(ButtonSoundEventType eventType)
+    private async Task PlaySound(ButtonSoundEventType eventType, AudioConfigDto audioConfig)
     {
-        var id = eventType switch
-        {
-            ButtonSoundEventType.ButtonPressed => "6",
-            ButtonSoundEventType.BuildQueued => "3",
-            ButtonSoundEventType.BuildNotQueued => "5", // 5, 14
-            ButtonSoundEventType.BuildSucceeded => "6", // 6
-            ButtonSoundEventType.BuildFailed => "9",
-            _ => "6"
-        };
-
+        var id = audioConfig.Sounds[eventType];
         await PlaySoundById(id);
     }
 
     private async Task PlaySoundById(string soundId)
     {
-        var soundLevel = 20;
-        // await _soundPlayer.SetVolumeAsync(soundLevel);
         await _soundPlayer.PlaySoundAsync(soundId);
     }
-    
-    private enum ButtonSoundEventType
-    {
-        ButtonPressed,
-        BuildQueued,
-        BuildNotQueued,
-        BuildSucceeded,
-        BuildFailed,
-    }
+}
+public enum ButtonSoundEventType
+{
+    ButtonPressed,
+    BuildQueued,
+    BuildNotQueued,
+    BuildSucceeded,
+    BuildFailed,
 }
