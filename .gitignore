@@ -1,1 +1,48 @@
-Nothing to output - the change list contains only a README.md file which is a source/config file, and there are no build artifacts, dependencies, or temp files to ignore.
+```
+# Build artifacts
+*.dll
+*.exe
+*.pdb
+*.so
+*.dylib
+*.obj
+*.o
+*.a
+*.lib
+*.out
+
+# Dependency directories
+packages/
+bin/
+obj/
+out/
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.local
+*.env.*
+
+# Editor/IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.tmp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test and coverage
+coverage/
+htmlcov/
+*.coverage
+.nyc_output/
+
+# Configuration backups
+*.bak
+*.backup
+```
