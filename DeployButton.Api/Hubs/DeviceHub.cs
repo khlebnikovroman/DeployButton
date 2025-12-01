@@ -1,7 +1,6 @@
 ﻿using DeployButton.Api.Abstractions;
 using DeployButton.Api.Configs;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.Options;
 
 namespace DeployButton.Api.Hubs;
 

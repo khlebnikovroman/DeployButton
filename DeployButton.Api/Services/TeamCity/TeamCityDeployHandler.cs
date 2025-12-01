@@ -1,19 +1,9 @@
-﻿using System.Text.Json;
 using DeployButton.Api.Abstractions;
+using DeployButton.Api.Abstractions.TeamCity;
 using DeployButton.Api.Configs;
-using Microsoft.Extensions.Options;
+using DeployButton.Api.Enums;
 
-namespace DeployButton.Api;
-
-public class TeamCityClientFactory : ITeamCityClientFactory
-{
-    public ITeamCityClient Create(TeamCityConfig config)
-    {
-        var handler = new HttpClientHandler { UseCookies = false };
-        var httpClient = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(15) };
-        return new TeamCityClient(httpClient, config);
-    }
-}
+namespace DeployButton.Api.Services.TeamCity;
 
 public class TeamCityDeployHandler : IDeployTrigger, IDisposable
 {

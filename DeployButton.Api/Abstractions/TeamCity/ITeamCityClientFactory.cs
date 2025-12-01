@@ -1,7 +1,6 @@
-﻿using DeployButton.Api.Abstractions.TeamCity;
 using DeployButton.Api.Configs;
 
-namespace DeployButton.Api.Factories;
+namespace DeployButton.Api.Abstractions.TeamCity;
 
 public interface ITeamCityClientFactory
 {

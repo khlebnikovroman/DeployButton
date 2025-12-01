@@ -4,7 +4,6 @@ using DeployButton.Api.Adapters;
 using DeployButton.Api.Configs;
 using DeployButton.Api.Factories;
 using DeployButton.Api.Models;
-using Microsoft.Extensions.Options;
 
 namespace DeployButton.Api.Services;
 

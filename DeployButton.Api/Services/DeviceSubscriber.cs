@@ -1,6 +1,8 @@
 ﻿using DeployButton.Api.Abstractions;
 using DeployButton.Api.Controllers;
+using DeployButton.Api.Enums;
 using DeployButton.Api.Hubs;
+using DeployButton.Api.Services;
 
 namespace DeployButton.Api.Services;
 
@@ -109,12 +111,4 @@ public class DeviceSubscriber : IDeviceSubscriber
     {
         await _soundPlayer.PlaySoundAsync(soundId);
     }
-}
-public enum ButtonSoundEventType
-{
-    ButtonPressed,
-    BuildQueued,
-    BuildNotQueued,
-    BuildSucceeded,
-    BuildFailed,
 }
