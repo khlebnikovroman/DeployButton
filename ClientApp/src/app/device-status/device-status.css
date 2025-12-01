@@ -1,0 +1,39 @@
+mat-card {
+  background: rgba(255, 255, 255, 0.8); /* полупрозрачный белый */
+  border: none;
+  border-radius: 12px;
+  padding: 16px;
+  backdrop-filter: blur(10px); /* если поддерживается */
+}
+
+mat-card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.status-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 8px 0;
+  padding: 8px 0;
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.03);
+}
+
+.status-value {
+  font-weight: 500;
+  color: #495057;
+}
+
+.status-value.connected {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.status-value.disconnected {
+  color: #dc3545;
+  font-weight: bold;
+}

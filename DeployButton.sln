@@ -1,6 +1,10 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeployButton", "DeployButton\DeployButton.csproj", "{EAA46C22-2DFF-4883-BFF3-D4C8B7C1C433}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeployButton.Api", "DeployButton.Api\DeployButton.Api.csproj", "{698C2CEE-6264-4266-8E47-D0320372C300}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mp3Formatter", "Mp3Formatter\Mp3Formatter.csproj", "{C220F19A-F4EE-4126-8FCD-1A04192CEBED}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mp3Shared", "Mp3Shared\Mp3Shared.csproj", "{77D8E046-AE28-4803-A68D-D508E880930F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -8,9 +12,17 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{EAA46C22-2DFF-4883-BFF3-D4C8B7C1C433}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EAA46C22-2DFF-4883-BFF3-D4C8B7C1C433}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EAA46C22-2DFF-4883-BFF3-D4C8B7C1C433}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EAA46C22-2DFF-4883-BFF3-D4C8B7C1C433}.Release|Any CPU.Build.0 = Release|Any CPU
+		{698C2CEE-6264-4266-8E47-D0320372C300}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{698C2CEE-6264-4266-8E47-D0320372C300}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{698C2CEE-6264-4266-8E47-D0320372C300}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{698C2CEE-6264-4266-8E47-D0320372C300}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C220F19A-F4EE-4126-8FCD-1A04192CEBED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C220F19A-F4EE-4126-8FCD-1A04192CEBED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C220F19A-F4EE-4126-8FCD-1A04192CEBED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C220F19A-F4EE-4126-8FCD-1A04192CEBED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77D8E046-AE28-4803-A68D-D508E880930F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77D8E046-AE28-4803-A68D-D508E880930F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77D8E046-AE28-4803-A68D-D508E880930F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77D8E046-AE28-4803-A68D-D508E880930F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

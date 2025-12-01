@@ -1,0 +1,35 @@
+<mat-card>
+  <mat-card-title>Состояние устройства</mat-card-title>
+  <mat-card-content>
+    <div class="status-row">
+      <span>Подключение:</span>
+      <span class="status-value"
+            [class.connected]="(deviceState$ | async)?.isConnected"
+            [class.disconnected]="!(deviceState$ | async)?.isConnected">
+        {{ (deviceState$ | async)?.isConnected ? 'Подключено' : 'Отключено' }}
+      </span>
+    </div>
+
+
+    @if (deviceState$ | async; as state) {
+      @if (state.isConnected) {
+        <div class="status-row">
+          <span>Порт:</span>
+          <span class="status-value">{{ state.portName }}</span>
+        </div>
+
+        <div class="status-row">
+          <span>Скорость:</span>
+          <span class="status-value">{{ state.baudRate }} бод</span>
+        </div>
+      }
+    }
+
+    <div class="status-row">
+      <span>Доступные порты:</span>
+      <span class="status-value">
+    {{ getAvailablePorts((deviceState$ | async)?.availablePorts) }}
+  </span>
+    </div>
+  </mat-card-content>
+</mat-card>
