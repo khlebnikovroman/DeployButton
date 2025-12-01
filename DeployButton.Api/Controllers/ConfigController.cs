@@ -1,7 +1,6 @@
 ﻿using System.Text.Json;
 using DeployButton.Api.Configs;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 
 namespace DeployButton.Api.Controllers;
 
@@ -9,16 +8,15 @@ namespace DeployButton.Api.Controllers;
 [Route("api/[controller]")]
 public class ConfigController : ControllerBase
 {
+    private readonly IConfigProvider<AppSettings> _configProvider;
     private readonly ILogger<ConfigController> _logger;
 
     public ConfigController(IConfigProvider<AppSettings> configProvider,
         ILogger<ConfigController> logger)
     {
-        _logger = logger;
         _configProvider = configProvider;
+        _logger = logger;
     }
-
-    private readonly IConfigProvider<AppSettings> _configProvider;
 
     [HttpGet]
     public IActionResult Get()

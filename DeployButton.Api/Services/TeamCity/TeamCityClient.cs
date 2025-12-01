@@ -1,16 +1,10 @@
-﻿using System.Net.Http.Headers;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using DeployButton.Api.Abstractions.TeamCity;
 using DeployButton.Api.Configs;
 
-namespace DeployButton.Api;
-
-public interface ITeamCityClient : IDisposable
-{
-    Task<bool> IsBuildQueuedOrRunningAsync();
-    Task<string> TriggerBuildAsync();
-    Task<string?> GetBuildStatusAsync(string buildId);
-}
+namespace DeployButton.Api.Services.TeamCity;
 
 public class TeamCityClient : ITeamCityClient
 {
@@ -42,6 +36,7 @@ public class TeamCityClient : ITeamCityClient
     private async Task<bool> IsBuildStateActiveAsync(string state)
     {
         var url = $"{_config.BaseUrl}/httpAuth/app/rest/builds?locator=buildType:{_config.BuildConfigurationId},state:{state},count:1";
+
         try
         {
             var response = await _httpClient.GetAsync(url);
