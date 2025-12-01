@@ -56,7 +56,7 @@ public class AudioSettingsController : ControllerBase
     [HttpGet("sounds")]
     public IActionResult GetSounds()
     {
-        var soundsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "sounds");
+        var soundsFolder = Path.Combine(AppContext.BaseDirectory, "wwwroot", "sounds");
         if (!Directory.Exists(soundsFolder))
             return Ok(Array.Empty<SoundDto>());
 
