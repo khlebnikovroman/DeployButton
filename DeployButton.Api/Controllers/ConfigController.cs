@@ -7,15 +7,23 @@ namespace DeployButton.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ConfigController(
-    IOptions<AppSettings> currentOptions,
-    ILogger<ConfigController> logger)
-    : ControllerBase
+public class ConfigController : ControllerBase
 {
+    private readonly ILogger<ConfigController> _logger;
+
+    public ConfigController(IConfigProvider<AppSettings> configProvider,
+        ILogger<ConfigController> logger)
+    {
+        _logger = logger;
+        _configProvider = configProvider;
+    }
+
+    private readonly IConfigProvider<AppSettings> _configProvider;
+
     [HttpGet]
     public IActionResult Get()
     {
-        return Ok(currentOptions.Value);
+        return Ok(_configProvider.Current);
     }
 
     [HttpPost]
@@ -32,28 +40,12 @@ public class ConfigController(
 
         try
         {
-            // Сохраняем в тот же файл, что и читаем: appsettings.settings.json рядом с .exe
-            var configPath = Path.Combine(AppContext.BaseDirectory, "appsettings.settings.json");
-
-            var json = JsonSerializer.Serialize(newConfig, new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                // Убедитесь, что enum'ы и null-значения сериализуются корректно
-            });
-
-            await System.IO.File.WriteAllTextAsync(configPath, json);
-
-            logger.LogInformation("Конфигурация сохранена в {Path}", configPath);
-
-            // Благодаря reloadOnChange: true в Program.cs,
-            // IOptionsMonitor<AppSettings> автоматически обновит значение
-            // и вызовет OnChange у подписчиков (в DeployButtonHostedService)
-
+            await _configProvider.SaveAsync(newConfig);
             return Ok(new { message = "Конфигурация успешно сохранена." });
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Ошибка при сохранении конфигурации");
+            _logger.LogError(ex, "Ошибка при сохранении конфигурации");
             return StatusCode(500, new { error = "Не удалось сохранить файл конфигурации." });
         }
     }

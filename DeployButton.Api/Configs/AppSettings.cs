@@ -10,7 +10,7 @@ public class AppSettings
 public class SerialPortConfig
 {
     public string PortName { get; set; } = "auto";
-    public int BaudRate { get; set; } = 9600;
+    public int BaudRate { get; set; } = 115200;
 }
 
 public class TeamCityConfig

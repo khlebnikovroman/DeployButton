@@ -8,14 +8,14 @@ namespace DeployButton.Api.Hubs;
 public class DeviceHub : Hub
 {
     private readonly IDeviceStateProvider _deviceStateProvider;
-    private readonly IOptionsMonitor<AppSettings> _options;
+    private readonly IConfigProvider<AppSettings> _configProvider;
 
     public DeviceHub(
         IDeviceStateProvider deviceStateProvider,
-        IOptionsMonitor<AppSettings> options)
+        IConfigProvider<AppSettings> configProvider)
     {
         _deviceStateProvider = deviceStateProvider;
-        _options = options;
+        _configProvider = configProvider;
     }
 
     public override async Task OnConnectedAsync()
@@ -24,7 +24,7 @@ public class DeviceHub : Hub
         await Clients.Caller.SendAsync("DeviceStateChanged", _deviceStateProvider.CurrentState);
 
         // Отправляем текущую конфигурацию (опционально)
-        await Clients.Caller.SendAsync("ConfigUpdated", _options.CurrentValue);
+        await Clients.Caller.SendAsync("ConfigUpdated", _configProvider.Current);
 
         await base.OnConnectedAsync();
     }

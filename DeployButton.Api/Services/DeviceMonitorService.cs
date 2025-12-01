@@ -28,24 +28,24 @@ public class DeviceMonitorHostedService : IHostedService
 }
 public class DeviceMonitorService : ISerialDeviceAdapterProvider, IHostedService, IDisposable 
 {
-    private readonly IOptionsMonitor<AppSettings> _options;
     private readonly IDeviceStateProvider _stateProvider;
     private readonly ISerialDeviceAdapterFactory _adapterFactory;
     private readonly ILogger<DeviceMonitorService> _logger;
+    private readonly IConfigProvider<AppSettings> _configProvider;
 
     private CancellationTokenSource? _cts;
     private readonly Lock _adapterLock = new();
 
     public DeviceMonitorService(
-        IOptionsMonitor<AppSettings> options,
         IDeviceStateProvider stateProvider,
         ISerialDeviceAdapterFactory adapterFactory,
-        ILogger<DeviceMonitorService> logger)
+        ILogger<DeviceMonitorService> logger,
+        IConfigProvider<AppSettings> configProvider)
     {
-        _options = options;
         _stateProvider = stateProvider;
         _adapterFactory = adapterFactory;
         _logger = logger;
+        _configProvider = configProvider;
     }
 
     private SerialDeviceAdapter? CurrentAdapter
@@ -70,7 +70,7 @@ public class DeviceMonitorService : ISerialDeviceAdapterProvider, IHostedService
     {
         while (!ct.IsCancellationRequested)
         {
-            var config = _options.CurrentValue;
+            var config = _configProvider.Current;
             var availablePorts = SerialPort.GetPortNames();
 
             SerialDeviceAdapter? adapter = null;

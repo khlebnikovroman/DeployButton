@@ -13,10 +13,10 @@ public class AudioConfigDto
     // Словарь: тип события → ID звука (может быть пустой строкой = выключено)
     public Dictionary<ButtonSoundEventType, string> Sounds { get; set; } = new()
     {
-        { ButtonSoundEventType.BuildQueued, "0002" },
-        { ButtonSoundEventType.BuildNotQueued, "" },
-        { ButtonSoundEventType.BuildSucceeded, "0003" },
-        { ButtonSoundEventType.BuildFailed, "0004" }
+        { ButtonSoundEventType.BuildQueued, "0003" },
+        { ButtonSoundEventType.BuildNotQueued, "0014" },
+        { ButtonSoundEventType.BuildSucceeded, "0024" },
+        { ButtonSoundEventType.BuildFailed, "0012" }
     };
 }
 public class SoundDto

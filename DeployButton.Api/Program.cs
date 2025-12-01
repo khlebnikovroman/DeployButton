@@ -19,13 +19,17 @@ public class Program
 
         builder.Configuration
             .SetBasePath(AppContext.BaseDirectory)
-            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
-            .AddJsonFile("appsettings.settings.json", optional: false, reloadOnChange: true)
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
             .Build();
 
         // === 2. Сервисы DI ===
-        builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
         builder.Services.AddSignalR();
+        builder.Services.AddSingleton<IConfigProvider<AppSettings>>(sp =>
+        {
+            var logger = sp.GetRequiredService<ILogger<FileConfigProvider<AppSettings>>>();
+            return new FileConfigProvider<AppSettings>("appsettings.settings.json", logger);
+        });
+
         builder.Services.AddSingleton<IDeviceEventPublisher, DeviceEventPublisher>();
         builder.Services.AddSingleton<IDeviceStateProvider, DeviceStateProvider>();
         builder.Services.AddSingleton<IDeployTrigger, TeamCityDeployHandler>();

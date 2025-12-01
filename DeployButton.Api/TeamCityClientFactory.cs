@@ -1,4 +1,5 @@
-﻿using DeployButton.Api.Abstractions;
+﻿using System.Text.Json;
+using DeployButton.Api.Abstractions;
 using DeployButton.Api.Configs;
 using Microsoft.Extensions.Options;
 
@@ -16,30 +17,32 @@ public class TeamCityClientFactory : ITeamCityClientFactory
 
 public class TeamCityDeployHandler : IDeployTrigger, IDisposable
 {
-    private readonly IOptionsMonitor<AppSettings> _options;
     private readonly ILogger<TeamCityDeployHandler> _logger;
+    private readonly IConfigProvider<AppSettings> _configProvider;
     private readonly ITeamCityClientFactory _clientFactory;
-    private ITeamCityClient _teamCityClient;
-
+    private ITeamCityClient? _teamCityClient;
+    private TeamCityConfig _config;
     private int _isHandling = 0;
     private CancellationTokenSource _cts = new();
 
     public TeamCityDeployHandler(
-        IOptionsMonitor<AppSettings> options,
         ILogger<TeamCityDeployHandler> logger,
+        IConfigProvider<AppSettings> configProvider,
         ITeamCityClientFactory clientFactory)
     {
-        _options = options ?? throw new ArgumentNullException(nameof(options));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _clientFactory = clientFactory ?? throw new ArgumentNullException(nameof(clientFactory));
-        options.OnChange(ApplySettings);
-        ApplySettings(options.CurrentValue);
+        _logger = logger;
+        _configProvider = configProvider;
+        _clientFactory = clientFactory;
+        ApplySettings(_configProvider.Current);
+        _configProvider.OnChange += ApplySettings;
     }
 
+    
     private void ApplySettings(AppSettings settings)
     {
         _cts.Cancel();
         _cts = new CancellationTokenSource();
+        _config = settings.TeamCity;
         _teamCityClient?.Dispose();
         _teamCityClient = _clientFactory.Create(settings.TeamCity);
     }
@@ -54,7 +57,7 @@ public class TeamCityDeployHandler : IDeployTrigger, IDisposable
 
         try
         {
-            var config = _options.CurrentValue.TeamCity;
+            var config = _config;
             if (string.IsNullOrWhiteSpace(config.BaseUrl) || string.IsNullOrWhiteSpace(config.BuildConfigurationId))
             {
                 _logger.LogError("TeamCity: не указаны BaseUrl или BuildConfigurationId");
@@ -123,5 +126,6 @@ public class TeamCityDeployHandler : IDeployTrigger, IDisposable
     public void Dispose()
     {
         _cts.Cancel();
+        _configProvider.OnChange -= ApplySettings;
     }
 }
