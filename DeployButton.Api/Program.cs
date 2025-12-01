@@ -9,7 +9,7 @@ using DeployButton.Api.Services;
 using DeployButton.Api.Services.TeamCity;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.FileProviders;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 
 namespace DeployButton.Api;
 
